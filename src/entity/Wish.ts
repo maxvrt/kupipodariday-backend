@@ -32,7 +32,11 @@ export class Wish {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
   // сколько сейчас готовы скинуть на подарок
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', {
+    precision: 10,
+    scale: 2,
+    default: 222,
+  })
   raised: number;
   // user который добавил пожелание подарка
   @ManyToOne(() => User, (user) => user.wishes)
@@ -43,6 +47,6 @@ export class Wish {
   // массив ссылок на заявки скинуться от других пользователей
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
-  @Column() // cчётчик тех, кто скопировал подарок себе
+  @Column({ default: 0 }) // cчётчик тех, кто скопировал подарок себе
   copied: number;
 }

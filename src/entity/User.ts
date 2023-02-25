@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { IsEmail, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Wish } from './Wish';
 import { Offer } from './Offer';
 import { Wishlist } from './Wishlist';
@@ -28,7 +28,7 @@ export class User {
   }) // от 2 до 200
   @Length(2, 200)
   about: string;
-  //@IsUrl
+  //@IsUrl()
   @Column('varchar', {
     default: 'https://i.pravatar.cc/300',
   })
@@ -37,6 +37,7 @@ export class User {
   @IsEmail()
   email: string;
   @Column() // пароль, строка
+  @IsNotEmpty()
   password: string;
   @OneToMany(() => Wish, (wish) => wish.owner)
   wishes: Wish[];
