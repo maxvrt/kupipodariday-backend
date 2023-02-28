@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { User } from '../entity/User';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -11,6 +20,11 @@ export class UsersController {
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  getProfile() {
+    return this.usersService.findOne(Number(1));
+  }
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(Number(id));
@@ -18,11 +32,6 @@ export class UsersController {
   @Get(':name')
   findByUsername(@Param('username') username: string): Promise<User[]> {
     return this.usersService.findByUsername(username);
-  }
-  @Post()
-  // тело запроса и валидация тела через DTO
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
   }
   @Put(':id')
   async updateById(
