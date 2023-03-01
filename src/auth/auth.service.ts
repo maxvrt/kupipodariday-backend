@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { JwtService } from '@nestjs/jwt';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entity/User';
@@ -12,6 +12,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = hashSync(createUserDto.password, 10);
@@ -22,6 +23,10 @@ export class AuthService {
     const user = await this.userRepository.create(newObj);
     console.log(`${JSON.stringify(newObj)}`);
     return this.userRepository.save(user);
+  }
+  auth(user: User) {
+    const payload = { sub: user.id };
+    return { auth_token: this.jwtService.sign(payload) };
   }
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { username } });
