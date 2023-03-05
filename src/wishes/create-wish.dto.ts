@@ -1,4 +1,6 @@
 import { IsNotEmpty, IsString, IsUrl, Length } from 'class-validator';
+import { ManyToOne } from 'typeorm';
+import { User } from '../entity/User';
 
 export class CreateWishDto {
   @IsString()
@@ -16,4 +18,6 @@ export class CreateWishDto {
   @IsString()
   @Length(1, 1024)
   description: string;
+  @ManyToOne(() => User, (user) => user.wishes)
+  owner: User;
 }

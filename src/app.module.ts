@@ -10,6 +10,8 @@ import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
 import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -23,6 +25,11 @@ import { AuthModule } from './auth/auth.module';
       database: 'kupipodariday',
       entities: [User, Wish, Offer, Wishlist],
       synchronize: true,
+    }),
+    PassportModule,
+    JwtModule.register({
+      secret: '4sdN9LQUhARIEHKl',
+      signOptions: { expiresIn: '3h' },
     }),
     UsersModule,
     WishesModule,

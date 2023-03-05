@@ -17,8 +17,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * В JWT стратегии в качестве параметра метод получает полезную нагрузку из токена
    */
   async validate(jwtPayload: { sub: number }) {
+    console.log(jwtPayload.sub + ' - id пользователя');
     /* В subject токена будем передавать идентификатор пользователя */
-    const user = this.usersService.findOne(jwtPayload.sub);
+    const user = await this.usersService.findOne(jwtPayload.sub);
     if (!user) {
       throw new UnauthorizedException();
     }

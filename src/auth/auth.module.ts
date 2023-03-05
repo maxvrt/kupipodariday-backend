@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,9 +8,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
 import { UsersService } from '../users/users.service';
+import { UsersModule } from '../users/users.module';
 
+@Global()
 @Module({
   imports: [
+    UsersModule,
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
@@ -18,6 +21,7 @@ import { UsersService } from '../users/users.service';
       signOptions: { expiresIn: '3h' },
     }),
   ],
+  exports: [AuthService],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, LocalStrategy, UsersService],
 })

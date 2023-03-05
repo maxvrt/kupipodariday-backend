@@ -30,7 +30,6 @@ export class Wishlist {
   description: string;
   @Column()
   image: string;
-  // !! набор ссылок на подарки. односторонняя связь
   @ManyToMany(() => Wish)
   @JoinTable()
   items: Wish[];

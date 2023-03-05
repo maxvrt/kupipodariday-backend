@@ -7,7 +7,9 @@ import {
   Param,
   Delete,
   Res,
-  UnauthorizedException, UseGuards, Req
+  UnauthorizedException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -47,7 +49,7 @@ export class AuthController {
     // const payload = { sub: user.id };
     // const token = this.jwtService.sign(payload);
     res.cookie('auth_token', auth_token, { httpOnly: true, secure: true });
-    res.json({ message: `Login successful. Token: ${auth_token}` });
+    res.json({ message: `${auth_token}` });
     return auth_token;
   }
 
