@@ -1,28 +1,19 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { User } from '../entity/User';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
 import { FindUserDto } from './find-user.dto';
-import { WishesService } from '../wishes/wishes.service';
+import { hashSync } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(forwardRef(() => WishesService))
-    private wishesService: WishesService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
-  }
+
   async findOne(id: number): Promise<User> {
     // обращение к базе
     return this.userRepository.findOneBy({ id: id });
@@ -31,7 +22,13 @@ export class UsersService {
     return await this.userRepository.findOneBy({ username: username });
   }
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.userRepository.create(createUserDto);
+    const hashedPassword = hashSync(createUserDto.password, 10);
+    // замена пароля в объекте пользователя
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...rest } = createUserDto;
+    const newObj = { ...rest, password: hashedPassword };
+    const user = await this.userRepository.create(newObj);
+    console.log(`${JSON.stringify(newObj)}`);
     return this.userRepository.save(user);
   }
   async updateById(

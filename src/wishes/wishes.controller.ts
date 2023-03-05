@@ -30,7 +30,7 @@ export class WishesController {
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req): Promise<Wish> {
     console.log(`${JSON.stringify(req.user)}`);
-    return this.wishesService.findOne(Number(id), req.user);
+    return this.wishesService.findOne(Number(id));
   }
   @Get()
   async findAll(): Promise<Wish[]> {

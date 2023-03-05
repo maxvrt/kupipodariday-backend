@@ -1,39 +1,27 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateUserDto } from '../users/create-user.dto';
-import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto/login.dto';
 import { LocalGuard } from './local.guard';
+import { UsersService } from '../users/users.service';
 
 @Controller('')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post('signup')
   // тело запроса и валидация тела через DTO
   async create(@Body() createUserDto: CreateUserDto, @Res() res) {
-    const user = await this.authService.create(createUserDto);
-    const payload = { sub: user.id };
-    const token = this.jwtService.sign(payload);
-    res.cookie('auth_token', token, { httpOnly: true, sameSite: 'strict' });
-    return res.send(`User registered successfully token: ${token}`);
+    const user = await this.usersService.create(createUserDto);
+    const { auth_token } = this.authService.auth(user);
+    res.cookie('auth_token', auth_token, {
+      httpOnly: true,
+      sameSite: 'strict',
+    });
+    res.send(`User registered successfully token: ${auth_token}`);
+    return auth_token;
   }
   /**
    * Стратегия local автоматически достанет username и password из тела запроса
@@ -43,33 +31,8 @@ export class AuthController {
   @Post('signin')
   async login(@Req() req, @Res() res) {
     const { auth_token } = this.authService.auth(req.user);
-    // if (!user) {
-    //   throw new UnauthorizedException('Invalid credentials');
-    // }
-    // const payload = { sub: user.id };
-    // const token = this.jwtService.sign(payload);
     res.cookie('auth_token', auth_token, { httpOnly: true, secure: true });
     res.json({ message: `${auth_token}` });
     return auth_token;
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
   }
 }

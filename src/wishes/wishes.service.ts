@@ -1,30 +1,21 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from '../entity/Wish';
 import { Repository, UpdateResult } from 'typeorm';
 import { CreateWishDto } from './create-wish.dto';
 import { UpdateWishDto } from './update-wish.dto';
 import { User } from '../entity/User';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class WishesService {
   constructor(
-    @Inject(forwardRef(() => UsersService))
-    private usersService: UsersService,
     @InjectRepository(Wish)
     private wishRepository: Repository<Wish>,
   ) {}
   async findAll(): Promise<Wish[]> {
     return this.wishRepository.find();
   }
-  // приходит объект, его нужно через деструктаризацию привести к нужному виду: совоё или чужное желание
-  async findOne(id: number, user: User): Promise<Wish> {
+  async findOne(id: number): Promise<Wish> {
     // обращение к базе с запросом нужных зависимостей
     return this.wishRepository.findOne({
       relations: {
