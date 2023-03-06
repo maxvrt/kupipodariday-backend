@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entity/User';
-import { compareSync } from 'bcrypt';
 import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
       return null;
     }
     //TODO проверить сравнение паролей
-    const isPasswordValid = compareSync(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     console.log(`пароли совпали: ${isPasswordValid}`);
     if (!isPasswordValid) {
       return null;
