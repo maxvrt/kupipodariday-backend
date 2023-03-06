@@ -37,16 +37,15 @@ export class UsersService {
   ): Promise<UpdateResult> {
     return this.userRepository.update({ id: id }, updateUserDto);
   }
-  async findNameEmail(searchString: FindUserDto): Promise<User> {
-    const findValue = searchString.searchStr;
-    console.log(`Строка поиска - ${findValue}`);
+  async findNameEmail(searchString: FindUserDto): Promise<User[]> {
+    const findValue = searchString.query;
     if (findValue.includes('@')) {
-      return await this.userRepository.findOneBy({
-        username: findValue,
+      return await this.userRepository.find({
+        where: { email: findValue },
       });
     } else {
-      return await this.userRepository.findOneBy({
-        email: findValue,
+      return await this.userRepository.find({
+        where: { username: findValue },
       });
     }
   }

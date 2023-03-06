@@ -16,6 +16,7 @@ import { JwtGuard } from '../auth/jwt.guard';
 import { WishesService } from '../wishes/wishes.service';
 import { FindUserDto } from './find-user.dto';
 
+@UseGuards(JwtGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -23,7 +24,6 @@ export class UsersController {
     private wishesService: WishesService,
   ) {}
 
-  @UseGuards(JwtGuard)
   @Get('me')
   profile(@Req() req): Promise<User> {
     const user = req.user;
@@ -33,21 +33,14 @@ export class UsersController {
   findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(Number(id));
   }
-  @UseGuards(JwtGuard)
   @Get(':username')
   findUser(@Param('username') username: string) {
     return this.usersService.findByName(username);
   }
-  @UseGuards(JwtGuard)
   @Get(':username/wishes')
   async findUserWishes(@Param('username') username: string) {
     const { id } = await this.usersService.findByName(username);
-    return this.wishesService.findWishesByName(id);
-  }
-  @Post()
-  // тело запроса и валидация тела через DTO
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.wishesService.findWishesByOwner(id);
   }
   @Put(':id')
   async updateById(

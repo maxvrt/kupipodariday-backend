@@ -48,7 +48,7 @@ export class WishesController {
     @Body() updateWishDto: UpdateWishDto,
     @Req() req,
   ) {
-    return await this.wishesService.updateById(
+    return await this.wishesService.updateByOwner(
       Number(id),
       updateWishDto,
       req.user,
@@ -58,5 +58,18 @@ export class WishesController {
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
     return this.wishesService.remove(Number(id), req.user.id);
+  }
+  @UseGuards(JwtGuard)
+  @Post(':id/copy')
+  async copy(@Req() req, @Param('id') id: string) {
+    const wish = await this.wishesService.findOne(Number(id));
+    await this.wishesService.updateByCopied(wish.id);
+    const newWish = new Wish();
+    newWish.name = wish.name;
+    newWish.link = wish.link;
+    newWish.image = wish.image;
+    newWish.price = wish.price;
+    newWish.description = wish.description;
+    return this.wishesService.create(newWish, req.user);
   }
 }

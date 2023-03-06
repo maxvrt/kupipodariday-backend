@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Offer } from '../entity/offer';
 import { Repository } from 'typeorm';
+import { User } from '../entity/User';
+import { CreateOfferDto } from './create-offer.dto';
+import { WishesService } from '../wishes/wishes.service';
 
 @Injectable()
 export class OffersService {
   constructor(
     @InjectRepository(Offer)
     private offerRepository: Repository<Offer>,
+    private readonly wishesService: WishesService,
   ) {}
   async findAll(): Promise<Offer[]> {
     return this.offerRepository.find();
@@ -16,7 +20,15 @@ export class OffersService {
     // обращение к базе
     return this.offerRepository.findOneBy({ id: id });
   }
-  async create(offer: Offer): Promise<Offer> {
-    return this.offerRepository.save(offer);
+  async create(createOfferDto: CreateOfferDto, user: User): Promise<Offer> {
+    const wish = await this.wishesService.findOne(createOfferDto.itemId);
+    const newRised = wish.raised + createOfferDto.amount;
+    await this.wishesService.updateByRised(wish.id, newRised);
+    //TODO нужно ли разделять так: ...createOfferDto ведь в createOfferDto только необходимое
+    return this.offerRepository.save({
+      createOfferDto,
+      user,
+      item: wish,
+    });
   }
 }

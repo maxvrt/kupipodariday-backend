@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from '../entity/Wish';
 import { Repository, UpdateResult } from 'typeorm';
@@ -44,7 +44,7 @@ export class WishesService {
     const wish = this.wishRepository.create({ ...createWishDto, owner: user });
     return this.wishRepository.save(wish);
   }
-  async updateById(
+  async updateByOwner(
     id: number,
     updateWishDto: UpdateWishDto,
     user: User,
@@ -58,6 +58,20 @@ export class WishesService {
     } else {
       throw new UnauthorizedException('Это желание нельзя редактировать');
     }
+  }
+  async updateByCopied(id: number): Promise<UpdateResult> {
+    const wish = await this.wishRepository.findOneBy({ id: id });
+    const newCopied = wish.copied + 1;
+    return await this.wishRepository.update({ id: id }, { copied: newCopied });
+  }
+  async updateByRised(id: number, newRised: number): Promise<UpdateResult> {
+    // const wish = await this.wishRepository.findOneBy({ id: id });
+    // if (!wish) {
+    //   throw new NotFoundException(`Wish with ID ${id} not found`);
+    // }
+    // wish.raised = newRised;
+    // return this.wishRepository.save(wish);
+    return await this.wishRepository.update({ id: id }, { raised: newRised });
   }
   async findLastMany(): Promise<Wish[]> {
     return this.wishRepository.find({
@@ -80,7 +94,7 @@ export class WishesService {
     else throw new UnauthorizedException('Чужое желание нельзя удалить');
     return `This action removes a #${id} wish`;
   }
-  findWishesByName(id: number): Promise<Wish[]> {
+  findWishesByOwner(id: number): Promise<Wish[]> {
     return this.wishRepository.find({
       where: { owner: { id } },
     });

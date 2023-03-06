@@ -21,6 +21,7 @@ export class AuthService {
     }
     //TODO проверить сравнение паролей
     const isPasswordValid = compareSync(password, user.password);
+    console.log(`пароли совпали: ${isPasswordValid}`);
     if (!isPasswordValid) {
       return null;
     }

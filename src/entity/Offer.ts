@@ -28,8 +28,6 @@ export class Offer {
   // сумма заявки
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
-  @Column('boolean', {
-    default: false,
-  }) // показывать ли информацию о скидывающемся в списке
-  hidden = false;
+  @Column('boolean', { default: false }) // показывать ли информацию о скидывающемся в списке
+  hidden: false;
 }
