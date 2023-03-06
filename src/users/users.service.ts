@@ -35,6 +35,9 @@ export class UsersService {
     id: number,
     updateUserDto: UpdateUserDto,
   ): Promise<UpdateResult> {
+    if (updateUserDto.password) {
+      updateUserDto.password = hashSync(updateUserDto.password, 10);
+    }
     return this.userRepository.update({ id: id }, updateUserDto);
   }
   async findNameEmail(searchString: FindUserDto): Promise<User[]> {

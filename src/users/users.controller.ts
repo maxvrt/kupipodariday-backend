@@ -3,8 +3,8 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -37,17 +37,19 @@ export class UsersController {
   findUser(@Param('username') username: string) {
     return this.usersService.findByName(username);
   }
+  @Get('me/wishes')
+  async findMyWishes(@Req() req) {
+    return this.wishesService.findWishesByOwner(req.user.id);
+  }
   @Get(':username/wishes')
   async findUserWishes(@Param('username') username: string) {
     const { id } = await this.usersService.findByName(username);
     return this.wishesService.findWishesByOwner(id);
   }
-  @Put(':id')
-  async updateById(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    await this.usersService.updateById(Number(id), updateUserDto);
+  @Patch('me')
+  async updateById(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    await this.usersService.updateById(req.user.id, updateUserDto);
+    return this.usersService.findOne(req.user.id);
   }
   @Post('find')
   findByNameEmail(@Body() findUserDto: FindUserDto) {
