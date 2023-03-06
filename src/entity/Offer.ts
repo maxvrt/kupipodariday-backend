@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './User';
 import { Wish } from './Wish';
+import { IsNumber } from 'class-validator';
 
 // Схема желающих скинуться
 @Entity()
@@ -26,8 +27,14 @@ export class Offer {
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
   // сумма заявки
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column({
+    scale: 2,
+    default: 0,
+  })
+  @IsNumber()
   amount: number;
   @Column('boolean', { default: false }) // показывать ли информацию о скидывающемся в списке
   hidden: false;
+  @IsNumber()
+  itemId: number;
 }

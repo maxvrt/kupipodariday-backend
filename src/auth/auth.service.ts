@@ -19,7 +19,6 @@ export class AuthService {
     if (!user) {
       return null;
     }
-    //TODO проверить сравнение паролей
     const isPasswordValid = await bcrypt.compare(password, user.password);
     console.log(`пароли совпали: ${isPasswordValid}`);
     if (!isPasswordValid) {

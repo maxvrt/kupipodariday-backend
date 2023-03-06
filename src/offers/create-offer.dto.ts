@@ -4,11 +4,20 @@ import { Wish } from '../entity/Wish';
 import { IsNumber } from 'class-validator';
 
 export class CreateOfferDto {
+  // id пользователя желающего скинуться
+  @ManyToOne(() => User, (user) => user.offers)
+  user: User;
+  // ссылка на товар
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
-  @Column('decimal', { precision: 10, scale: 2 })
+  // сумма заявки
+  @Column({
+    scale: 2,
+    default: 0,
+  })
+  @IsNumber()
   amount: number;
-  @Column('boolean', { default: false })
+  @Column('boolean', { default: false }) // показывать ли информацию о скидывающемся в списке
   hidden: false;
   @IsNumber()
   itemId: number;

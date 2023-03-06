@@ -21,8 +21,9 @@ export class OffersService {
     return this.offerRepository.findOneBy({ id: id });
   }
   async create(createOfferDto: CreateOfferDto, user: User): Promise<Offer> {
-    const wish = await this.wishesService.findOne(createOfferDto.itemId);
-    const newRised = wish.raised + createOfferDto.amount;
+    const newId = Number(createOfferDto.itemId);
+    const wish = await this.wishesService.findOne(newId);
+    const newRised = wish.raised + Number(createOfferDto.amount);
     await this.wishesService.updateByRised(wish.id, newRised);
     //TODO нужно ли разделять так: ...createOfferDto ведь в createOfferDto только необходимое
     return this.offerRepository.save({
