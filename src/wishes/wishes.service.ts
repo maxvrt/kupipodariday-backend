@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wish } from '../entity/Wish';
-import { Repository, UpdateResult } from 'typeorm';
+import { FindManyOptions, In, Repository, UpdateResult } from 'typeorm';
 import { CreateWishDto } from './create-wish.dto';
 import { UpdateWishDto } from './update-wish.dto';
 import { User } from '../entity/User';
@@ -17,28 +21,29 @@ export class WishesService {
   }
   async findOne(id: number): Promise<Wish> {
     // обращение к базе с запросом нужных зависимостей
-    return this.wishRepository.findOne({
+    const wish: Wish = await this.wishRepository.findOne({
       relations: {
-        owner: {
-          wishes: true,
-          wishlists: {
-            owner: true,
-            items: true,
-          },
-          offers: {
-            user: {
-              wishes: true,
-              wishlists: true,
-              offers: true,
-            },
-          },
-        },
+        owner: true,
         offers: {
           user: true,
         },
       },
       where: { id },
     });
+    const newWish = {
+      ...wish,
+      offers: wish.offers
+        .filter((offer) => offer.hidden === false)
+        .map((offer) => ({
+          ...offer,
+          user: {
+            ...offer.user,
+            password: undefined,
+          },
+        })),
+    };
+    delete newWish.owner.password;
+    return newWish;
   }
   async create(createWishDto: CreateWishDto, user: User): Promise<Wish> {
     const wish = this.wishRepository.create({ ...createWishDto, owner: user });
@@ -98,5 +103,8 @@ export class WishesService {
     return this.wishRepository.find({
       where: { owner: { id } },
     });
+  }
+  findMany(items: number[]): Promise<Wish[]> {
+    return this.wishRepository.findBy({ id: In(items) });
   }
 }

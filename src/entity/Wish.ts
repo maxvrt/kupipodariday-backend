@@ -26,7 +26,7 @@ export class Wish {
   name: string;
   @Column()
   link: string;
-  @Column()
+  @Column({ nullable: true })
   @IsUrl()
   image: string;
   @Column('decimal', { precision: 10, scale: 2 })
@@ -41,7 +41,7 @@ export class Wish {
   // user который добавил пожелание подарка
   @ManyToOne(() => User, (user) => user.wishes)
   owner: User;
-  @Column()
+  @Column({ nullable: true })
   @Length(1, 1024)
   description: string;
   // массив ссылок на заявки скинуться от других пользователей

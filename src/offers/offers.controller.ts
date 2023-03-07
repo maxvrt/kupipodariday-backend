@@ -12,6 +12,7 @@ import { Offer } from '../entity/Offer';
 import { JwtGuard } from '../auth/jwt.guard';
 import { CreateOfferDto } from './create-offer.dto';
 
+@UseGuards(JwtGuard)
 @Controller('offers')
 export class OffersController {
   constructor(private offersService: OffersService) {}
@@ -23,7 +24,6 @@ export class OffersController {
   findOne(@Param('id') id: string): Promise<Offer> {
     return this.offersService.findOne(Number(id));
   }
-  @UseGuards(JwtGuard)
   @Post()
   async create(@Body() createOfferDto: CreateOfferDto, @Req() req) {
     return this.offersService.create(createOfferDto, req.user);

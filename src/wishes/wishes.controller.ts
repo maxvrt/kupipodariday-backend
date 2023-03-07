@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -8,6 +9,7 @@ import {
   Put,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Wish } from '../entity/Wish';
 import { WishesService } from './wishes.service';
@@ -26,10 +28,11 @@ export class WishesController {
   topWishes() {
     return this.wishesService.findTop();
   }
+  @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(JwtGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req): Promise<Wish> {
-    console.log(`${JSON.stringify(req.user)}`);
+    //console.log(`${JSON.stringify(req.user)}`);
     return this.wishesService.findOne(Number(id));
   }
   @Get()

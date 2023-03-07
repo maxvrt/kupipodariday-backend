@@ -8,7 +8,7 @@ import {
   JoinTable,
   ManyToMany,
 } from 'typeorm';
-import { Length } from 'class-validator';
+import { IsOptional, IsUrl, Length } from 'class-validator';
 import { User } from './User';
 import { Wish } from './Wish';
 
@@ -29,6 +29,7 @@ export class Wishlist {
   @Length(1, 1500)
   description: string;
   @Column()
+  @IsUrl()
   image: string;
   @ManyToMany(() => Wish)
   @JoinTable()
@@ -36,4 +37,7 @@ export class Wishlist {
   // дополнительная связь для созданных пользователем вишлистов
   @ManyToOne(() => User, (user) => user.wishes)
   owner: User;
+  @Column('simple-array')
+  @IsOptional()
+  itemsId: number[];
 }
