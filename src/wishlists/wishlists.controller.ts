@@ -16,7 +16,7 @@ import { CreateWishlistDto } from './create-wishlist.dto';
 import { UpdateWishlistDto } from './update-wishlist.dto';
 
 @UseGuards(JwtGuard)
-@Controller('wishlistsw')
+@Controller('wishlists')
 export class WishlistsController {
   constructor(private wishlistsService: WishlistsService) {}
   @Post()
