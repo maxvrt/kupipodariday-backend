@@ -101,6 +101,17 @@ export class WishesService {
   }
   findWishesByOwner(id: number): Promise<Wish[]> {
     return this.wishRepository.find({
+      relations: {
+        owner: true,
+        offers: {
+          user: {
+            wishlists: {
+              owner: true,
+              items: true,
+            },
+          },
+        },
+      },
       where: { owner: { id } },
     });
   }

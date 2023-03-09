@@ -20,8 +20,8 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'strict',
     });
-    res.send(`User registered successfully token: ${auth_token}`);
-    return auth_token;
+    res.json(user);
+    return user;
   }
   /**
    * Стратегия local автоматически достанет username и password из тела запроса

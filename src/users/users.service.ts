@@ -15,11 +15,17 @@ export class UsersService {
   ) {}
 
   async findOne(id: number): Promise<User> {
-    // обращение к базе
-    return this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository.findOneBy({ id: id });
+    return { ...user, password: undefined };
   }
-  async findByName(username: string) {
-    return await this.userRepository.findOneBy({ username: username });
+  async findByName(username: string, isValidation: boolean) {
+    if (isValidation)
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.username = :username', { username })
+        .getOne();
+    else return await this.userRepository.findOne({ where: { username } });
   }
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = hashSync(createUserDto.password, 10);
@@ -27,9 +33,9 @@ export class UsersService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...rest } = createUserDto;
     const newObj = { ...rest, password: hashedPassword };
-    const user = await this.userRepository.create(newObj);
-    console.log(`${JSON.stringify(newObj)}`);
-    return this.userRepository.save(user);
+    let user = await this.userRepository.create(newObj);
+    user = await this.userRepository.save(user);
+    return { ...user, password: undefined };
   }
   async updateById(
     id: number,

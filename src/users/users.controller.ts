@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { User } from '../entity/User';
@@ -24,17 +25,16 @@ export class UsersController {
   ) {}
 
   @Get('me')
-  profile(@Req() req): Promise<User> {
-    const user = req.user;
-    return this.usersService.findOne(Number(user.id));
-  }
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.usersService.findOne(Number(id));
+  async profile(@Req() req, @Res() res): Promise<User> {
+    let user = req.user;
+    user = await this.usersService.findOne(Number(user.id));
+    const newUser = { ...user, password: undefined };
+    res.json(newUser);
+    return newUser;
   }
   @Get(':username')
   findUser(@Param('username') username: string) {
-    return this.usersService.findByName(username);
+    return this.usersService.findByName(username, false);
   }
   @Get('me/wishes')
   async findMyWishes(@Req() req) {
@@ -42,7 +42,7 @@ export class UsersController {
   }
   @Get(':username/wishes')
   async findUserWishes(@Param('username') username: string) {
-    const { id } = await this.usersService.findByName(username);
+    const { id } = await this.usersService.findByName(username, false);
     return this.wishesService.findWishesByOwner(id);
   }
   @Patch('me')
