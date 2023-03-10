@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from '../entity/Wishlist';
@@ -15,35 +15,87 @@ export class WishlistsService {
     private wishesService: WishesService,
   ) {}
   async findAll(): Promise<Wishlist[]> {
-    console.log(`контроллер вишлистов`);
-    return this.wishlistRepository.find({
+    const wishList = await this.wishlistRepository.find({
+      select: {
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        image: true,
+        itemsId: false,
+      },
       relations: {
         owner: true,
         items: true,
       },
     });
+    wishList.map((item) => {
+      item.owner.email = undefined;
+    });
+    return wishList;
   }
   async findOne(id: number): Promise<Wishlist> {
-    return await this.wishlistRepository.findOne({
+    const newList = await this.wishlistRepository.findOne({
       where: { id: id },
       relations: ['items', 'owner'],
     });
+    newList.owner.email = undefined;
+    newList.itemsId = undefined;
+    return newList;
   }
   async create(
     createWishlistDto: CreateWishlistDto,
     user: User,
   ): Promise<Wishlist> {
     const items = await this.wishesService.findMany(createWishlistDto.itemsId);
-    return this.wishlistRepository.save({
+    const newList = await this.wishlistRepository.save({
       ...createWishlistDto,
       owner: user,
       items,
     });
+    newList.owner.email = undefined;
+    newList.itemsId = undefined;
+    newList.description = undefined;
+    return newList;
   }
-  update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return this.wishlistRepository.update(id, updateWishlistDto);
+  async update(id: number, updateWishlistDto: UpdateWishlistDto, user: User) {
+    const wishlist = await this.wishlistRepository.findOne({
+      where: { id: id },
+      relations: ['items', 'owner'],
+    });
+    if (user.id === wishlist.owner.id) {
+      const items = await this.wishesService.findMany(
+        updateWishlistDto.itemsId,
+      );
+      // Удаляем желания не из списка
+      // Проходим по всем желаниям (items)
+      wishlist.items.map((wishItem) => {
+        if (!updateWishlistDto.itemsId.includes(wishItem.id))
+          wishlist.items = wishlist.items.filter((item) => item !== wishItem);
+      });
+      await this.wishlistRepository.save(wishlist);
+      await this.wishlistRepository.update(id, {
+        ...updateWishlistDto,
+        items,
+      });
+      const newList = await this.wishlistRepository.findOne({
+        where: { id: id },
+        relations: ['items', 'owner'],
+      });
+      newList.owner.email = undefined;
+      newList.itemsId = undefined;
+      newList.description = undefined;
+      return newList;
+    }
+    return UnauthorizedException;
   }
-  delete(id: number) {
-    return this.wishlistRepository.delete(id);
+  async delete(id: number) {
+    const newList = await this.wishlistRepository.findOne({
+      where: { id: id },
+      relations: ['items', 'owner'],
+    });
+    newList.owner.email = undefined;
+    newList.itemsId = undefined;
+    await this.wishlistRepository.delete(id);
+    return newList;
   }
 }

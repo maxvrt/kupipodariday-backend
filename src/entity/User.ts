@@ -10,6 +10,7 @@ import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import { Wish } from './Wish';
 import { Offer } from './Offer';
 import { Wishlist } from './Wishlist';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -36,7 +37,8 @@ export class User {
   @Column('varchar', { unique: true }) // email уникальный
   @IsEmail()
   email: string;
-  @Column() // пароль, строка
+  @Exclude()
+  @Column({ select: false }) // пароль, строка
   @IsNotEmpty()
   password: string;
   @OneToMany(() => Wish, (wish) => wish.owner)

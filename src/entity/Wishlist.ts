@@ -35,7 +35,11 @@ export class Wishlist {
   @JoinTable()
   items: Wish[];
   // дополнительная связь для созданных пользователем вишлистов
-  @ManyToOne(() => User, (user) => user.wishes)
+  @ManyToOne(() => User, (user) => user.wishlists, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   owner: User;
   @Column('simple-array')
   @IsOptional()

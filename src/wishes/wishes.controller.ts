@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Req,
@@ -45,7 +46,7 @@ export class WishesController {
     return this.wishesService.create(createWishDto, req.user);
   }
   @UseGuards(JwtGuard)
-  @Put(':id')
+  @Patch(':id')
   async updateById(
     @Param('id') id: string,
     @Body() updateWishDto: UpdateWishDto,

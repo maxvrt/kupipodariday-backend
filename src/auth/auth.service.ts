@@ -15,10 +15,12 @@ export class AuthService {
     return { auth_token: this.jwtService.sign(payload) };
   }
   async validateUser(username: string, password: string): Promise<User | null> {
-    const user = await this.usersService.findByName(username);
+    const user = await this.usersService.findByName(username, true);
+    console.log(`нашли пользователя ${JSON.stringify(user.username)}`);
     if (!user) {
       return null;
     }
+    console.log(`нашли пароль: ${user.password}`);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     console.log(`пароли совпали: ${isPasswordValid}`);
     if (!isPasswordValid) {
