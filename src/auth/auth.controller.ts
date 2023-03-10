@@ -32,7 +32,7 @@ export class AuthController {
   async login(@Req() req, @Res() res) {
     const { auth_token } = this.authService.auth(req.user);
     res.cookie('auth_token', auth_token, { httpOnly: true, secure: true });
-    res.json({ message: `${auth_token}` });
+    res.json({ access_token: `${auth_token}` });
     return auth_token;
   }
 }

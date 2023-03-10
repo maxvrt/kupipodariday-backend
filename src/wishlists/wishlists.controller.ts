@@ -38,7 +38,6 @@ export class WishlistsController {
     @Body() updateWishlistDto: UpdateWishlistDto,
     @Req() req,
   ) {
-    console.log(`Вошли в обновление листа`);
     return await this.wishlistsService.update(
       Number(id),
       updateWishlistDto,

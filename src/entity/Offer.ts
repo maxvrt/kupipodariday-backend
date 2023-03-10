@@ -23,7 +23,7 @@ export class Offer {
   // id пользователя желающего скинуться
   @ManyToOne(() => User, (user) => user.offers)
   user: User;
-  // ссылка на товар
+  // ссылка на желание
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
   // сумма заявки

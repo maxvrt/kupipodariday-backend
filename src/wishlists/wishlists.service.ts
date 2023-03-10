@@ -88,7 +88,14 @@ export class WishlistsService {
     }
     return UnauthorizedException;
   }
-  delete(id: number) {
-    return this.wishlistRepository.delete(id);
+  async delete(id: number) {
+    const newList = await this.wishlistRepository.findOne({
+      where: { id: id },
+      relations: ['items', 'owner'],
+    });
+    newList.owner.email = undefined;
+    newList.itemsId = undefined;
+    await this.wishlistRepository.delete(id);
+    return newList;
   }
 }

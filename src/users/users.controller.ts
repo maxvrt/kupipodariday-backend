@@ -38,7 +38,7 @@ export class UsersController {
   }
   @Get('me/wishes')
   async findMyWishes(@Req() req) {
-    return this.wishesService.findWishesByOwner(req.user.id);
+    return this.wishesService.findWishesByMe(req.user.id);
   }
   @Get(':username/wishes')
   async findUserWishes(@Param('username') username: string) {
