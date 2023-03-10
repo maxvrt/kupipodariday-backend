@@ -25,7 +25,10 @@ export class UsersService {
         .addSelect('user.password')
         .where('user.username = :username', { username })
         .getOne();
-    else return await this.userRepository.findOne({ where: { username } });
+    else {
+      const user = await this.userRepository.findOne({ where: { username } });
+      return { ...user, email: undefined };
+    }
   }
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = hashSync(createUserDto.password, 10);

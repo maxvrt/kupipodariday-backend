@@ -39,7 +39,11 @@ export class Wish {
   })
   raised: number;
   // user который добавил пожелание подарка
-  @ManyToOne(() => User, (user) => user.wishes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.wishes, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   owner: User;
   @Column({ nullable: true })
   @Length(1, 1024)

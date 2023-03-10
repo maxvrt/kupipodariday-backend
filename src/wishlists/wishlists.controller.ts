@@ -29,14 +29,21 @@ export class WishlistsController {
   }
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Wishlist> {
+    console.log(`get вишлистов`);
     return this.wishlistsService.findOne(Number(id));
   }
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,
+    @Req() req,
   ) {
-    return await this.wishlistsService.update(Number(id), updateWishlistDto);
+    console.log(`Вошли в обновление листа`);
+    return await this.wishlistsService.update(
+      Number(id),
+      updateWishlistDto,
+      req.user,
+    );
   }
   @Delete(':id')
   remove(@Param('id') id: string) {

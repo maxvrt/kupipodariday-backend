@@ -25,7 +25,12 @@ export class WishesService {
       relations: {
         owner: true,
         offers: {
-          user: true,
+          user: {
+            wishlists: {
+              owner: true,
+              items: true,
+            },
+          },
         },
       },
       where: { id },
@@ -45,21 +50,23 @@ export class WishesService {
     delete newWish.owner.password;
     return newWish;
   }
-  async create(createWishDto: CreateWishDto, user: User): Promise<Wish> {
+  async create(createWishDto: CreateWishDto, user: User): Promise<string> {
     const wish = this.wishRepository.create({ ...createWishDto, owner: user });
-    return this.wishRepository.save(wish);
+    await this.wishRepository.save(wish);
+    return '{}';
   }
   async updateByOwner(
     id: number,
     updateWishDto: UpdateWishDto,
     user: User,
-  ): Promise<UpdateResult> {
+  ): Promise<string> {
     const wish = await this.wishRepository.findOne({
       where: { id: id },
       relations: ['owner'],
     });
     if (user.id === wish.owner.id && wish.raised < 0.1) {
-      return this.wishRepository.update({ id: id }, updateWishDto);
+      await this.wishRepository.update({ id: id }, updateWishDto);
+      return '{}';
     } else {
       throw new UnauthorizedException('Это желание нельзя редактировать');
     }
@@ -80,26 +87,22 @@ export class WishesService {
   }
   async findLastMany(): Promise<Wish[]> {
     return this.wishRepository.find({
+      relations: {
+        owner: true,
+        offers: {
+          user: {
+            wishlists: {
+              owner: true,
+              items: true,
+            },
+          },
+        },
+      },
       order: { id: 'DESC' },
       take: 40,
     });
   }
   async findTop(): Promise<Wish[]> {
-    return this.wishRepository.find({
-      order: { copied: 'DESC' },
-      take: 20,
-    });
-  }
-  async remove(id: number, userId) {
-    const wish = await this.wishRepository.findOne({
-      where: { id: id },
-      relations: ['owner'],
-    });
-    if (wish.owner.id === userId) await this.wishRepository.delete({ id });
-    else throw new UnauthorizedException('Чужое желание нельзя удалить');
-    return `This action removes a #${id} wish`;
-  }
-  findWishesByOwner(id: number): Promise<Wish[]> {
     return this.wishRepository.find({
       relations: {
         owner: true,
@@ -112,7 +115,41 @@ export class WishesService {
           },
         },
       },
+      order: { copied: 'DESC' },
+      take: 20,
+    });
+  }
+  // TODO посмотреть удаление желания
+  async remove(id: number, userId) {
+    const wish = await this.wishRepository.findOne({
+      where: { id: id },
+      relations: ['owner'],
+    });
+    if (wish.owner.id === userId) await this.wishRepository.delete({ id });
+    else throw new UnauthorizedException('Чужое желание нельзя удалить');
+    return `This action removes a #${id} wish`;
+  }
+  findWishesByOwner(id: number): Promise<Wish[]> {
+    return this.wishRepository.find({
+      relations: {
+        offers: {
+          user: {
+            wishes: {
+              owner: true,
+            },
+            offers: {
+              user: true,
+            },
+            wishlists: {
+              owner: true,
+              items: true,
+            },
+          },
+          item: { owner: true },
+        },
+      },
       where: { owner: { id } },
+      order: { id: 'DESC' },
     });
   }
   findMany(items: number[]): Promise<Wish[]> {

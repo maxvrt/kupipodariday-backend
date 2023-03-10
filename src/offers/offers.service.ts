@@ -14,20 +14,44 @@ export class OffersService {
     private readonly wishesService: WishesService,
   ) {}
   async findAll(): Promise<Offer[]> {
-    return this.offerRepository.find();
+    return this.offerRepository.find({
+      relations: {
+        item: {
+          owner: true,
+        },
+        user: {
+          wishes: { owner: true },
+          offers: { user: true },
+          wishlists: { owner: true, items: true },
+        },
+      },
+    });
   }
   async findOne(id: number): Promise<Offer> {
-    return this.offerRepository.findOneBy({ id: id });
+    return this.offerRepository.findOne({
+      relations: {
+        item: {
+          owner: true,
+        },
+        user: {
+          wishes: { owner: true },
+          offers: { user: true },
+          wishlists: { owner: true, items: true },
+        },
+      },
+      where: { id: id },
+    });
   }
-  async create(createOfferDto: CreateOfferDto, user: User): Promise<Offer> {
+  async create(createOfferDto: CreateOfferDto, user: User): Promise<string> {
     const newId = Number(createOfferDto.itemId);
     const wish = await this.wishesService.findOne(newId);
     const newRised = wish.raised + Number(createOfferDto.amount);
     await this.wishesService.updateByRised(wish.id, newRised);
-    return this.offerRepository.save({
+    await this.offerRepository.save({
       ...createOfferDto,
       user,
       item: wish,
     });
+    return '{}';
   }
 }
