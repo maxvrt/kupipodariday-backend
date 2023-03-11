@@ -4,11 +4,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Wish } from '../entity/Wish';
+import { Wish } from './entity/Wish';
 import { FindManyOptions, In, Repository, UpdateResult } from 'typeorm';
-import { CreateWishDto } from './create-wish.dto';
-import { UpdateWishDto } from './update-wish.dto';
-import { User } from '../entity/User';
+import { CreateWishDto } from './dto/create-wish.dto';
+import { UpdateWishDto } from './dto/update-wish.dto';
+import { User } from '../users/entity/User';
 
 @Injectable()
 export class WishesService {
@@ -35,26 +35,32 @@ export class WishesService {
       },
       where: { id },
     });
-    const newWish = {
-      ...wish,
-      offers: wish.offers
-        .filter((offer) => offer.hidden === false)
-        .map((offer) => ({
-          ...offer,
-          user: {
-            ...offer.user,
-            password: undefined,
-          },
-        })),
-    };
-    delete newWish.owner.email;
-    newWish.offers.map((of) => {
-      of.user.wishlists.map((wl) => {
-        wl.owner.email = undefined;
-        wl.itemsId = undefined;
-      });
-    });
-    return newWish;
+    if (wish) {
+      let newWish = { ...wish };
+      if (wish?.offers)
+        newWish = {
+          ...wish,
+          offers: wish.offers
+            .filter((offer) => offer.hidden === false)
+            .map((offer) => ({
+              ...offer,
+              user: {
+                ...offer.user,
+                password: undefined,
+              },
+            })),
+        };
+      delete newWish.owner?.email;
+      if (newWish.offers)
+        newWish.offers.map((of) => {
+          of.user.wishlists.map((wl) => {
+            wl.owner.email = undefined;
+            wl.itemsId = undefined;
+          });
+        });
+      return newWish;
+    }
+    return null;
   }
   async create(createWishDto: CreateWishDto, user: User): Promise<string> {
     const wish = this.wishRepository.create({ ...createWishDto, owner: user });
@@ -130,12 +136,13 @@ export class WishesService {
     });
     if (wish.owner.id === userId) {
       wish.owner.email = undefined;
-      wish.offers.map((of) => {
-        of.user.wishlists.map((wl) => {
-          if (wl.owner?.email) wl.owner.email = undefined;
-          if (wl.itemsId) wl.itemsId = undefined;
+      if (wish.offers && wish.offers.length > 0)
+        wish.offers.map((of) => {
+          of.user.wishlists.map((wl) => {
+            if (wl.owner?.email) wl.owner.email = undefined;
+            if (wl.itemsId) wl.itemsId = undefined;
+          });
         });
-      });
       await this.wishRepository.delete({ id });
     } else throw new UnauthorizedException('Чужое желание нельзя удалить');
     return wish;

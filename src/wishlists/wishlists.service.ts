@@ -1,11 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Wishlist } from '../entity/Wishlist';
-import { User } from '../entity/User';
-import { CreateWishlistDto } from './create-wishlist.dto';
+import { Wishlist } from './entity/Wishlist';
+import { User } from '../users/entity/User';
+import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { WishesService } from '../wishes/wishes.service';
-import { UpdateWishlistDto } from './update-wishlist.dto';
+import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @Injectable()
 export class WishlistsService {
@@ -17,6 +21,7 @@ export class WishlistsService {
   async findAll(): Promise<Wishlist[]> {
     const wishList = await this.wishlistRepository.find({
       select: {
+        id: true,
         name: true,
         createdAt: true,
         updatedAt: true,
@@ -62,20 +67,21 @@ export class WishlistsService {
       where: { id: id },
       relations: ['items', 'owner'],
     });
-    if (user.id === wishlist.owner.id) {
-      const items = await this.wishesService.findMany(
-        updateWishlistDto.itemsId,
-      );
+    if (user.id === wishlist.owner.id && updateWishlistDto.itemsId) {
       // Удаляем желания не из списка
       // Проходим по всем желаниям (items)
       wishlist.items.map((wishItem) => {
         if (!updateWishlistDto.itemsId.includes(wishItem.id))
           wishlist.items = wishlist.items.filter((item) => item !== wishItem);
       });
+      // Добавляем в items желания из списка
+      const wishes = await this.wishesService.findMany(
+        updateWishlistDto.itemsId,
+      );
+      wishlist.items.push(...wishes);
       await this.wishlistRepository.save(wishlist);
       await this.wishlistRepository.update(id, {
         ...updateWishlistDto,
-        items,
       });
       const newList = await this.wishlistRepository.findOne({
         where: { id: id },
@@ -86,16 +92,19 @@ export class WishlistsService {
       newList.description = undefined;
       return newList;
     }
-    return UnauthorizedException;
+    throw new UnauthorizedException('Список не получается отредактировать');
   }
   async delete(id: number) {
     const newList = await this.wishlistRepository.findOne({
       where: { id: id },
       relations: ['items', 'owner'],
     });
-    newList.owner.email = undefined;
-    newList.itemsId = undefined;
-    await this.wishlistRepository.delete(id);
-    return newList;
+    if (newList) {
+      newList.owner.email = undefined;
+      newList.itemsId = undefined;
+      await this.wishlistRepository.delete(id);
+      return newList;
+    }
+    throw new NotFoundException('Список не найден');
   }
 }

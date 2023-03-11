@@ -8,8 +8,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Length, IsUrl } from 'class-validator';
-import { User } from './User';
-import { Offer } from './Offer';
+import { User } from '../../users/entity/User';
+import { Offer } from '../../offers/entity/Offer';
 
 // Схема для подарков
 @Entity()
@@ -32,10 +32,11 @@ export class Wish {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
   // сколько сейчас готовы скинуть на подарок
+  // Todo проверить тип, нужен float или double?
   @Column('decimal', {
     precision: 10,
     scale: 2,
-    default: 222,
+    default: 0,
   })
   raised: number;
   // user который добавил пожелание подарка

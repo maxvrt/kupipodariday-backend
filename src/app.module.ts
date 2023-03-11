@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entity/User';
-import { Wish } from './entity/Wish';
-import { Offer } from './entity/Offer';
-import { Wishlist } from './entity/Wishlist';
+import { User } from './users/entity/User';
+import { Wish } from './wishes/entity/Wish';
+import { Offer } from './offers/entity/Offer';
+import { Wishlist } from './wishlists/entity/Wishlist';
 import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';

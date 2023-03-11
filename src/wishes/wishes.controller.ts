@@ -12,10 +12,10 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Wish } from '../entity/Wish';
+import { Wish } from './entity/Wish';
 import { WishesService } from './wishes.service';
-import { CreateWishDto } from './create-wish.dto';
-import { UpdateWishDto } from './update-wish.dto';
+import { CreateWishDto } from './dto/create-wish.dto';
+import { UpdateWishDto } from './dto/update-wish.dto';
 import { JwtGuard } from '../auth/jwt.guard';
 
 @Controller('wishes')

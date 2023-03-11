@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
-import { User } from '../entity/User';
-import { CreateUserDto } from './create-user.dto';
-import { UpdateUserDto } from './update-user.dto';
-import { FindUserDto } from './find-user.dto';
+import { User } from './entity/User';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { FindUserDto } from './dto/find-user.dto';
 import { hashSync } from 'bcrypt';
 
 @Injectable()

@@ -7,9 +7,9 @@ import {
   OneToMany,
 } from 'typeorm';
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
-import { Wish } from './Wish';
-import { Offer } from './Offer';
-import { Wishlist } from './Wishlist';
+import { Wish } from '../../wishes/entity/Wish';
+import { Offer } from '../../offers/entity/Offer';
+import { Wishlist } from '../../wishlists/entity/Wishlist';
 import { Exclude } from 'class-transformer';
 
 @Entity()
