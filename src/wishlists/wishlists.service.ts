@@ -5,11 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Wishlist } from '../entity/Wishlist';
-import { User } from '../entity/User';
-import { CreateWishlistDto } from './create-wishlist.dto';
+import { Wishlist } from './entity/Wishlist';
+import { User } from '../users/entity/User';
+import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { WishesService } from '../wishes/wishes.service';
-import { UpdateWishlistDto } from './update-wishlist.dto';
+import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
 @Injectable()
 export class WishlistsService {
@@ -21,6 +21,7 @@ export class WishlistsService {
   async findAll(): Promise<Wishlist[]> {
     const wishList = await this.wishlistRepository.find({
       select: {
+        id: true,
         name: true,
         createdAt: true,
         updatedAt: true,

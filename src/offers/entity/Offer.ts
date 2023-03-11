@@ -6,8 +6,8 @@ import {
   UpdateDateColumn,
   ManyToOne,
 } from 'typeorm';
-import { User } from './User';
-import { Wish } from './Wish';
+import { User } from '../../users/entity/User';
+import { Wish } from '../../wishes/entity/Wish';
 import { IsNumber } from 'class-validator';
 
 // Схема желающих скинуться

@@ -1,6 +1,6 @@
 import { Column, ManyToOne } from 'typeorm';
-import { User } from '../entity/User';
-import { Wish } from '../entity/Wish';
+import { User } from '../../users/entity/User';
+import { Wish } from '../../wishes/entity/Wish';
 import { IsNumber } from 'class-validator';
 
 export class CreateOfferDto {

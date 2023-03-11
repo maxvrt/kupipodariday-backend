@@ -9,8 +9,8 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { IsOptional, IsUrl, Length } from 'class-validator';
-import { User } from './User';
-import { Wish } from './Wish';
+import { User } from '../../users/entity/User';
+import { Wish } from '../../wishes/entity/Wish';
 
 // Cхема списка подарков
 @Entity()

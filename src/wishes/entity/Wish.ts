@@ -8,8 +8,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Length, IsUrl } from 'class-validator';
-import { User } from './User';
-import { Offer } from './Offer';
+import { User } from '../../users/entity/User';
+import { Offer } from '../../offers/entity/Offer';
 
 // Схема для подарков
 @Entity()
