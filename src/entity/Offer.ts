@@ -24,7 +24,11 @@ export class Offer {
   @ManyToOne(() => User, (user) => user.offers)
   user: User;
   // ссылка на желание
-  @ManyToOne(() => Wish, (wish) => wish.offers)
+  @ManyToOne(() => Wish, (wish) => wish.offers, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   item: Wish;
   // сумма заявки
   @Column({

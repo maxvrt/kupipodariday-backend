@@ -130,12 +130,13 @@ export class WishesService {
     });
     if (wish.owner.id === userId) {
       wish.owner.email = undefined;
-      wish.offers.map((of) => {
-        of.user.wishlists.map((wl) => {
-          if (wl.owner?.email) wl.owner.email = undefined;
-          if (wl.itemsId) wl.itemsId = undefined;
+      if (wish.offers && wish.offers.length > 0)
+        wish.offers.map((of) => {
+          of.user.wishlists.map((wl) => {
+            if (wl.owner?.email) wl.owner.email = undefined;
+            if (wl.itemsId) wl.itemsId = undefined;
+          });
         });
-      });
       await this.wishRepository.delete({ id });
     } else throw new UnauthorizedException('Чужое желание нельзя удалить');
     return wish;

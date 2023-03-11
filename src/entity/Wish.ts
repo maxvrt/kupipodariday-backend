@@ -32,10 +32,11 @@ export class Wish {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
   // сколько сейчас готовы скинуть на подарок
+  // Todo проверить тип, нужен float или double?
   @Column('decimal', {
     precision: 10,
     scale: 2,
-    default: 222,
+    default: 0,
   })
   raised: number;
   // user который добавил пожелание подарка

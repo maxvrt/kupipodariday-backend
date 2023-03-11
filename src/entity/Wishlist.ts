@@ -31,15 +31,15 @@ export class Wishlist {
   @Column()
   @IsUrl()
   image: string;
-  @ManyToMany(() => Wish)
-  @JoinTable()
-  items: Wish[];
-  // дополнительная связь для созданных пользователем вишлистов
-  @ManyToOne(() => User, (user) => user.wishlists, {
+  @ManyToMany(() => Wish, {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
+  @JoinTable()
+  items: Wish[];
+  // дополнительная связь для созданных пользователем вишлистов
+  @ManyToOne(() => User, (user) => user.wishlists)
   owner: User;
   @Column('simple-array')
   @IsOptional()
